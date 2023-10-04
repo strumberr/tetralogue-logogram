@@ -3,6 +3,18 @@ import math
 
 
 
+def distance(ax, ay, bx, by):
+    return math.sqrt((by - ay)**2 + (bx - ax)**2)
+
+def rotated_about(ax, ay, bx, by, angle):
+    radius = distance(ax, ay, bx, by)
+    angle += math.atan2(ay - by, ax - bx)
+    return (
+        round(bx + radius * math.cos(angle)),
+        round(by + radius * math.sin(angle))
+    )
+
+
 
 WIDTH, HEIGHT = 1000, 1000
 BACKGROUND_COLOR = (255, 255, 255)  # White
@@ -39,6 +51,20 @@ angle_between_triangles = 360 / num_triangles
 
 start_angle = 120
 
+# Define a function to rotate a point about another point by a given angle
+def rotate_point(point, angle, origin):
+    ox, oy = origin
+    px, py = point
+    qx = ox + math.cos(angle) * (px - ox) - math.sin(angle) * (py - oy)
+    qy = oy + math.sin(angle) * (px - ox) + math.cos(angle) * (py - oy)
+    return (qx, qy)
+
+# Angle by which you want to rotate the triangles (in radians)
+rotation_angle = math.radians(0)  # Adjust as needed
+
+# Center of rotation (the center of the circle)
+rotation_center = (WIDTH // 2, HEIGHT // 2)
+
 # Loop to create and place the triangles in a circle with the edge/point facing the center
 for i in range(num_triangles):
     angle = math.radians(start_angle - i * angle_between_triangles)
@@ -58,11 +84,10 @@ for i in range(num_triangles):
     # Draw the triangle on the image
     draw.polygon([(x1, y1), (x2, y2), (x3, y3), (x1, y1)], outline="black")
 
-    #get the name of the triangle
+    # Get the name of the triangle
     triangle_name = f"triangle{i}"
 
     draw.text([x1 - 20, y1 + 40], triangle_name, fill=(0, 0, 0))
-
 
     # Store the triangle coordinates in the dictionary
     array_triangles_coords[i] = {
@@ -73,6 +98,8 @@ for i in range(num_triangles):
         "x3": x3,
         "y3": y3,
     }
+
+
 
 
 
@@ -198,19 +225,37 @@ def create_triangle(image, counter, char):
     triangle_size = 50
     triangle_height = int(triangle_size * (3 ** 0.5) / 2)
 
-    if counter >= 0:
-        previous_triangle = array_triangles_coords[section_org]
-        x1, y1 = previous_triangle['x1'], previous_triangle['y1']
-        x2, y2 = previous_triangle['x2'], previous_triangle['y2']
-    else:
+    if not array_triangles_coords[section_org]:
+        # If there are no previous triangles in this section, initialize the coordinates
+        center_x, center_y = WIDTH // 2, HEIGHT // 2
+        triangle_size = 50
+        triangle_height = int(triangle_size * (3 ** 0.5) / 2)
         x1 = center_x - triangle_size // 2
         y1 = center_y + triangle_height // 2
         x2 = x1 + triangle_size
         y2 = y1
+        x3 = x1 + triangle_size // 2
+        y3 = y1 - triangle_height
+    else:
+        # If there are previous triangles in this section, stack the new triangle below
+        previous_triangle = array_triangles_coords[section_org]
+        x1 = previous_triangle['x1']  # Connect to the previous triangle's top-left corner
+        y1 = previous_triangle['y1'] - triangle_height
+        x2 = previous_triangle['x2']  # Connect to the previous triangle's top-right corner
+        y2 = previous_triangle['y2'] - triangle_height
+        x3 = previous_triangle['x3']  # Connect to the previous triangle's top corner
+        y3 = previous_triangle['y3'] - triangle_height
 
-    
-    x3 = x1 + triangle_size // 2
-    y3 = y1 - triangle_height
+
+        # previous_triangle = array_triangles_coords[section_org]
+        # x1 = previous_triangle['x3']  # Connect to the previous triangle's top corner
+        # y1 = previous_triangle['y3']
+        # x2 = previous_triangle['x1']  # Connect to the previous triangle's top-left corner
+        # y2 = previous_triangle['y1']
+        # x3 = x1 - (triangle_size // 2)  # Connect to the left of the previous triangle
+        # y3 = y1
+
+   
 
     # Store the coordinates in a dictionary
     triangle_corners2 = {
@@ -273,7 +318,7 @@ def create_triangle(image, counter, char):
 
 
 # Text to be represented
-text = "cryptcryptcrypt"
+text = "abcdefghijklmnopqrstuvwxyz"
 
 
 # Create and display an image representing each character
