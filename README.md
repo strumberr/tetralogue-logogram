@@ -4,7 +4,7 @@
 
 **Transform Text into Cryptic Logograms with Python**
 
-The Logogram Generator is a powerful Python tool for creating intriguing logograms. It arranges small equilateral triangles on a digital canvas to produce a visual code that conceals the original text within an artistic geometric tapestry.
+The Logogram Generator is a Python tool for creating intriguing logograms. It arranges small equilateral triangles on a digital canvas to produce a visual code that conceals the original text within an artistic geometric tapestry.
 
 ## Example
 
@@ -13,7 +13,9 @@ Input (String): "crypt"
 ![alt text](assets/tetralogue.png)
 Logogram: [logogram.png](assets/tetralogue.png)
 
-I am aware that the logogram is called "Tetra"-logue, which is a combining form meaning “four". But thats part of the joke
+I am aware that the logogram is called "Tetra"-logue, which is a combining form meaning “four". But thats part of the joke.
+
+**This is also my first time making anything related to cryptography or logograms, so it might not be incredibly advanced**
 
 ## Usage
 
