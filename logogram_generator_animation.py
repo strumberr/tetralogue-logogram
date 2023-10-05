@@ -387,16 +387,16 @@ for i, char in enumerate(text):
         left_or_right = 1
         segment_counter[map_input_to_output_sections(alphabet_dict[char][0])] = 0
 
+    create_triangle(image, i, char, left_or_right)
+
     image_np = np.array(image)
     cv2.imshow("Image", image_np)
+    
     key = cv2.waitKey(1) & 0xFF
     if key == 27:  # Press 'ESC' key to exit the loop
         break
 
-
-    create_triangle(image, i, char, left_or_right)
-
-    time.sleep(0.08)
+    time.sleep(0.04)
 
 
 # Save the final image

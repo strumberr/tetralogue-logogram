@@ -11,6 +11,8 @@ Input (String): "crypt"
 ![alt text](assets/tetralogue.png)
 Logogram: [logogram.png](assets/tetralogue.png)
 
+https://github.com/strumberr/tetralogue-logogram/assets/82328097/44c863cb-3749-47a5-b0be-3c797d420727
+
 I am aware that the logogram is called "Tetra"-logue, which is a combining form meaning “four". But thats part of the joke.
 
 **This is also my first time making anything related to cryptography or logograms, so it might not be incredibly advanced**
