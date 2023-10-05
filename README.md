@@ -34,7 +34,7 @@ I am aware that the logogram is called "Tetra"-logue, which is a combining form 
 
    Replace `"Your message"` with the text you want to transform into a logogram.
 
-4. **Output**: The script generates a logogram as an image file in the same directory.
+4. **Output**: The script generates and immediately displays the logogram, and saves it as an image file in the same directory.
 
 ## How It Works
 
