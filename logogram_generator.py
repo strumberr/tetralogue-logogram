@@ -2,7 +2,6 @@ from PIL import Image, ImageDraw, ImageFont
 import math
 
 
-
 def distance(ax, ay, bx, by):
     return math.sqrt((by - ay)**2 + (bx - ax)**2)
 
@@ -16,10 +15,10 @@ def rotated_about(ax, ay, bx, by, angle):
 
 
 
-WIDTH, HEIGHT = 1000, 1000
+WIDTH, HEIGHT = 1200, 1200
 BACKGROUND_COLOR = (255, 255, 255)  # White
 
-triangle_size = 50
+triangle_size = 80
 triangle_height = int(triangle_size * (3 ** 0.5) / 2)  # Height of the equilateral triangle
 
 num_triangles = 13
@@ -44,7 +43,7 @@ array_triangles_coords = {}  # Dictionary to store triangle coordinates
 horizontal_spacing = triangle_size
 
 # Calculate the radius of the circle
-radius = min(WIDTH, HEIGHT) / 4
+radius = min(WIDTH, HEIGHT) / 6
 
 # Calculate the angle between each triangle
 angle_between_triangles = 360 / num_triangles
@@ -114,7 +113,7 @@ for i in range(num_triangles):
 
 print(array_triangles_coords)
 
-counter_rotator = 0
+
 
 alphabet_dict = {
     'a': [1, 0], 'b': [2, 1], 'c': [3, 0], 'd': [4, 1], 'e': [5, 0], 'f': [6, 1], 'g': [7, 0], 'h': [8, 1], 'i': [9, 0], 'j': [10, 1],
@@ -188,7 +187,6 @@ def transform_input(input_value):
 
 
 def create_triangle(image, counter, char, left_or_right_2):
-    global counter_rotator
 
 
     # result = (math.exp(char_value) + math.sin(char_value)) / (math.sqrt(char_value) + math.log10(char_value + 2))
@@ -225,7 +223,7 @@ def create_triangle(image, counter, char, left_or_right_2):
 
 
 
-    triangle_size = 50
+    triangle_size = 80
     triangle_height = int(triangle_size * (3 ** 0.5) / 2)
 
     if not array_triangles_coords[section_org]:
@@ -262,28 +260,18 @@ def create_triangle(image, counter, char, left_or_right_2):
 
 
     else:
+
         # Rotate the equilateral triangle by the calculated angle
         rotation_angle = math.radians(60)  # 60 degrees for equilateral triangle
-        x2 = x1 + triangle_size * math.cos(angle + rotation_angle)
-        y2 = y1 + triangle_size * math.sin(angle + rotation_angle)
-        x3 = x2 + triangle_size * math.cos(angle - rotation_angle)
-        y3 = y2 + triangle_size * math.sin(angle - rotation_angle)
+        x2 = x1 + triangle_size * math.cos(angle - rotation_angle)
+        y2 = y1 + triangle_size * math.sin(angle - rotation_angle)
+        x1 = x2 + triangle_size * math.cos(angle + rotation_angle)
+        y1 = y2 + triangle_size * math.sin(angle + rotation_angle)
+        
+        x3 = x1 + (x2 - x1) * math.cos(rotation_angle) - (y2 - y1) * math.sin(rotation_angle)
+        y3 = y1 + (x2 - x1) * math.sin(rotation_angle) + (y2 - y1) * math.cos(rotation_angle)
 
 
-
-
-
-
-
-
-
-        # previous_triangle = array_triangles_coords[section_org]
-        # x1 = previous_triangle['x3']  # Connect to the previous triangle's top corner
-        # y1 = previous_triangle['y3']
-        # x2 = previous_triangle['x1']  # Connect to the previous triangle's top-left corner
-        # y2 = previous_triangle['y1']
-        # x3 = x1 - (triangle_size // 2)  # Connect to the left of the previous triangle
-        # y3 = y1
 
    
 
@@ -370,14 +358,11 @@ def create_triangle(image, counter, char, left_or_right_2):
 
 
 # Text to be represented
-text = "nikolozi s ef e".lower().replace(' ', '')
+text = "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz".lower().replace(' ', '')
+
 
 # create a dict with how many times each character appears in the text
 text_array = {}
-
-segments_array = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0,
-                  6: 0, 7: 0, 8: 0, 9: 0, 10: 0,
-                  11: 0, 12: 0, 13: 0}
 
 # Initialize the segment counter
 segment_counter = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0,
@@ -386,9 +371,21 @@ segment_counter = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0,
 
 triangle_count = 0
 
+
+
 for i, char in enumerate(text):
     left_or_right = 0
+
+    if segment_counter[map_input_to_output_sections(alphabet_dict[char][0])] == 0:
+        left_or_right = 0
+        segment_counter[map_input_to_output_sections(alphabet_dict[char][0])] = 1
+    else:
+        left_or_right = 1
+        segment_counter[map_input_to_output_sections(alphabet_dict[char][0])] = 0
+
+
     create_triangle(image, i, char, left_or_right)
+
 
 
 # Save the final image
