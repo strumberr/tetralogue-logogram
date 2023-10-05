@@ -1,5 +1,3 @@
-### This project is a work-in-progress! Probably won't work yet
-
 # Tetralogue Logogram Generator 
 
 **Transform Text into Cryptic Logograms with Python**
@@ -31,7 +29,7 @@ I am aware that the logogram is called "Tetra"-logue, which is a combining form 
 3. **Run the Script**:
 
     ```bash
-    python logogram_comb.py "Your message"
+    python logogram_generation_command.py "Your message"
     ```
 
    Replace `"Your message"` with the text you want to transform into a logogram.
