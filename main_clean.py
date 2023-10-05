@@ -259,7 +259,7 @@ def create_triangle(image, counter, char, left_or_right_2):
 
     array_triangles_coords[section_org] = triangle_corners2
 
-text = "storm"
+text = "storm".lower().replace(' ', '')
 
 text_array = {}
 

@@ -268,7 +268,7 @@ def main():
 
         array_triangles_coords[section_org] = triangle_corners2
 
-    text = message
+    text = message.lower().replace(' ', '')
 
     text_array = {}
 

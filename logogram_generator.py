@@ -370,7 +370,7 @@ def create_triangle(image, counter, char, left_or_right_2):
 
 
 # Text to be represented
-text = "nikolozi"
+text = "nikolozi s ef e".lower().replace(' ', '')
 
 # create a dict with how many times each character appears in the text
 text_array = {}
