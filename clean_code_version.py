@@ -1,5 +1,8 @@
 from PIL import Image, ImageDraw, ImageFont
 import math
+import time
+import numpy as np
+import cv2
 
 
 def distance(ax, ay, bx, by):
@@ -14,7 +17,7 @@ def rotated_about(ax, ay, bx, by, angle):
     )
 
 
-WIDTH, HEIGHT = 1200, 1200
+WIDTH, HEIGHT = 1400, 1400
 BACKGROUND_COLOR = (255, 255, 255)  
 
 triangle_size = 80
@@ -36,8 +39,7 @@ start_y = (HEIGHT - total_height) // 2
 image = Image.new("RGB", (WIDTH, HEIGHT), "white")
 draw = ImageDraw.Draw(image)
 
-array_triangles_coords = {}  
-
+array_triangles_coords = {}
 
 horizontal_spacing = triangle_size
 
@@ -88,7 +90,7 @@ for i in range(num_triangles):
     
     draw.polygon([(x1, y1), (x2, y2), (x3, y3), (x1, y1)], outline="black")
 
-    
+
     triangle_name = f"triangle{i}"
 
     
@@ -175,7 +177,7 @@ def transform_input(input_value):
         return output_value
     
 
-def create_triangle(image, counter, char, left_or_right_2):
+def create_triangle(image, counter, char, left_or_right_2, number_char_appear):
 
 
     char_value = alphabet_dict[char][0]
@@ -191,9 +193,6 @@ def create_triangle(image, counter, char, left_or_right_2):
     section_org = (map_input_to_output_sections(char_value)) - 1
 
 
-    print(char_value, b_o_w, map_input_to_output(char_value), map_input_to_output(char_value)[b_o_w], section_org)
-
-    
     center_x, center_y = WIDTH // 2, HEIGHT // 2
     draw = ImageDraw.Draw(image)
 
@@ -205,46 +204,78 @@ def create_triangle(image, counter, char, left_or_right_2):
         
         center_x, center_y = WIDTH // 2, HEIGHT // 2
         x1 = center_x - triangle_size / 2
-        y1 = center_y - triangle_height / 2  
+        y1 = center_y - triangle_height / 2
         x2 = x1 + triangle_size
         y2 = y1
-        x3 = center_x  
-        y3 = center_y + triangle_height  
+        x3 = center_x
+        y3 = center_y + triangle_height
     else:
         
         previous_triangle = array_triangles_coords[section_org]
 
         
-        x1 = previous_triangle['x1']    
-        y1 = previous_triangle['y1']    
-        x2 = previous_triangle['x2']    
-        y2 = previous_triangle['y2']    
-        x3 = x1 + (x2 - x1) / 2  
-        y3 = y1 + triangle_height  
+        x1 = previous_triangle['x1']
+        y1 = previous_triangle['y1']
+        x2 = previous_triangle['x2']
+        y2 = previous_triangle['y2']
+        x3 = x1 + (x2 - x1) / 2
+        y3 = y1 + triangle_height
 
         angle = math.atan2(y2 - y1, x2 - x1)
 
-    if left_or_right == 0:
-
+    if left_or_right_2 == 0:
         
         rotation_angle = math.radians(60)  
-        x2 = x1 + triangle_size * math.cos(angle - rotation_angle)
-        y2 = y1 + triangle_size * math.sin(angle - rotation_angle)
-        x3 = x2 + triangle_size * math.cos(angle + rotation_angle)
-        y3 = y2 + triangle_size * math.sin(angle + rotation_angle)
-
-
-    else:
-
-        
-        rotation_angle = math.radians(60)  
-        x2 = x1 + triangle_size * math.cos(angle - rotation_angle)
-        y2 = y1 + triangle_size * math.sin(angle - rotation_angle)
-        x1 = x2 + triangle_size * math.cos(angle + rotation_angle)
-        y1 = y2 + triangle_size * math.sin(angle + rotation_angle)
+        x2 = x2 + triangle_size * math.cos(angle + rotation_angle)
+        y2 = y2 + triangle_size * math.sin(angle + rotation_angle)
+        x1 = x1 + triangle_size * math.cos(angle + rotation_angle)
+        y1 = y1 + triangle_size * math.sin(angle + rotation_angle)
         
         x3 = x1 + (x2 - x1) * math.cos(rotation_angle) - (y2 - y1) * math.sin(rotation_angle)
         y3 = y1 + (x2 - x1) * math.sin(rotation_angle) + (y2 - y1) * math.cos(rotation_angle)
+
+        
+        x3 = x1 + (x2 - x1) * math.cos(rotation_angle) + (y2 - y1) * math.sin(rotation_angle)
+        y3 = y1 - (x2 - x1) * math.sin(rotation_angle) + (y2 - y1) * math.cos(rotation_angle)
+
+        
+    else:
+
+        rotation_angle = math.radians(-60)
+        x2 = x1 + triangle_size * math.cos(angle + rotation_angle)
+        y2 = y1 + triangle_size * math.sin(angle + rotation_angle)
+        x3 = x2 + triangle_size * math.cos(angle - rotation_angle)
+        y3 = y2 + triangle_size * math.sin(angle - rotation_angle)
+
+
+    if number_char_appear == 3:
+        
+        x1, y1 = rotated_about(x1, y1, x3, y3, math.radians(180))
+        x2, y2 = rotated_about(x2, y2, x3, y3, math.radians(180))
+        x3, y3 = rotated_about(x3, y3, x3, y3, math.radians(180))
+
+        x1, y1, x2, y2 = x2, y2, x1, y1
+    elif number_char_appear == 5:
+        x1, y1 = rotated_about(x1, y1, x3, y3, math.radians(180))
+        x2, y2 = rotated_about(x2, y2, x3, y3, math.radians(180))
+        x3, y3 = rotated_about(x3, y3, x3, y3, math.radians(180))
+
+        x1, y1, x2, y2 = x2, y2, x1, y1
+
+    elif number_char_appear == 7:
+        x1, y1 = rotated_about(x1, y1, x3, y3, math.radians(180))
+        x2, y2 = rotated_about(x2, y2, x3, y3, math.radians(180))
+        x3, y3 = rotated_about(x3, y3, x3, y3, math.radians(180))
+
+        x1, y1, x2, y2 = x2, y2, x1, y1
+
+    elif number_char_appear == 9:
+
+        x1, y1 = rotated_about(x1, y1, x3, y3, math.radians(180))
+        x2, y2 = rotated_about(x2, y2, x3, y3, math.radians(180))
+        x3, y3 = rotated_about(x3, y3, x3, y3, math.radians(180))
+
+        x1, y1, x2, y2 = x2, y2, x1, y1
 
 
     triangle_corners2 = {
@@ -255,13 +286,13 @@ def create_triangle(image, counter, char, left_or_right_2):
         "x3": x3,
         "y3": y3
     }
-
+    
    
     fill_color = (0, 0, 0) if b_o_w == 0 else (255, 255, 255)
     
     outline_color = (255, 255, 255) if b_o_w == 0 else (0, 0, 0)
 
-    line_width = 2
+    line_width = 4
 
 
     def get_triangle_coordinates(array_triangles_coords):
@@ -286,25 +317,23 @@ def create_triangle(image, counter, char, left_or_right_2):
 
         return x1, y1
 
-    print(array_triangles_coords[section_org])
 
-    
     triangle_coordinates = new_get_triangle_coordinates(array_triangles_coords)
 
     x1, y1, x2, y2, x3, y3 = triangle_coordinates
 
-    
+
     center_x = (x1 + x2 + x3) / 3
     center_y = (y1 + y2 + y3) / 3
 
 
     font_path = "assets/Oxanium-Regular.ttf"
     font = ImageFont.truetype(font_path, 20)
-
+    
 
     coordinates_triangle = [(x1, y1), (x2, y2), (x3, y3)]
 
-    
+
     draw.polygon(get_triangle_coordinates(array_triangles_coords), outline=outline_color, width=line_width, fill=fill_color)
     
     draw.text([center_x - 10, center_y - 10], str(counter), fill=outline_color, font=font)
@@ -312,32 +341,45 @@ def create_triangle(image, counter, char, left_or_right_2):
     array_triangles_coords[section_org] = triangle_corners2
 
     
-text = "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz".lower().replace(' ', '')
-
-
-text_array = {}
+text = "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz".lower().replace(' ', '')
 
 
 segment_counter = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0,
                    6: 0, 7: 0, 8: 0, 9: 0, 10: 0,
                    11: 0, 12: 0, 13: 0}
 
+
+segment_amount = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0,
+                   6: 0, 7: 0, 8: 0, 9: 0, 10: 0,
+                   11: 0, 12: 0, 13: 0}
+
+
 triangle_count = 0
 
+left_or_right = 0
 
 for i, char in enumerate(text):
-    left_or_right = 0
 
-    if segment_counter[map_input_to_output_sections(alphabet_dict[char][0])] == 0:
-        left_or_right = 0
-        segment_counter[map_input_to_output_sections(alphabet_dict[char][0])] = 1
-    else:
+    print(char, segment_amount[map_input_to_output_sections(alphabet_dict[char][0])])
+
+    number_char_appear = segment_amount[map_input_to_output_sections(alphabet_dict[char][0])]
+
+    if segment_amount[map_input_to_output_sections(alphabet_dict[char][0])] <= 1:
         left_or_right = 1
-        segment_counter[map_input_to_output_sections(alphabet_dict[char][0])] = 0
+
+    else:
+        left_or_right = 0 
 
 
-    create_triangle(image, i, char, left_or_right)
+    print("left_or_right: ", left_or_right)
 
+
+    create_triangle(image, i, char, left_or_right, number_char_appear)
+
+    
+    segment_amount[map_input_to_output_sections(alphabet_dict[char][0])] += 1
+    left_or_right = 0
+    
 
 image.save("logogram.png")
 image.show()
